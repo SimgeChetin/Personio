@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: int__customers_subscriptions
+    description: >
+      Intermediate model that joins customer details with subscription data
+      to provide a consolidated view of each customer's subscription lifecycle,
+      billing frequency, and current status.
+    columns:
+      - name: customer_id
+        description: Unique identifier for the customer.
+        tests:
+          - not_null
+      - name: customer_status
+        description: Current status of the customer (e.g., active, churned, etc.).
+      - name: billing_address
+        description: Customer's billing address.
+      - name: billing_email
+        description: Customer's billing email address.
+      - name: employee_count
+        description: Number of employees at the customer's company.
+      - name: customer_churn_billing_year_month
+        description: Month when the customer churned, if applicable (truncated to year-month).
+      - name: subscription_id
+        description: Unique identifier of the subscription.
+        tests:
+          - not_null
+      - name: subs_start_billing_year_month
+        description: Month when the subscription started (truncated to year-month).
+      - name: subs_end_billing_year_month
+        description: Month when the subscription ended or placeholder date if ongoing.
+      - name: is_subscription_to_renew
+        description: Boolean indicating if the subscription is still active and due for renewal.
+      - name: subs_billing_frequency
+        description: Frequency of the subscription billing (e.g., monthly, yearly).
+      - name: subs_amount
+        description: Amount billed for the subscription before discounts.
+      - name: subs_discount
+        description: Discount applied to the subscription.
+      - name: subs_plan_name
+        description: Name of the selected subscription plan (e.g., Core, Core Pro).
+      - name: subscription_status
+        description: Current status of the subscription (e.g., active, deactivated, waiting etc.).
+
+    data_tests:
+      - dbt_constraints.primary_key:
+          column_names:
+            - customer_id
+            - subscription_id
