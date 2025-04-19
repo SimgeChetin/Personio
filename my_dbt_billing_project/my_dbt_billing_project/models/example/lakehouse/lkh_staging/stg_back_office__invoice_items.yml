@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: stg_back_office__invoices
+  - name: stg_back_office__invoice_items
     description: >
       Staged model for invoices, sourced from the raw invoices table. 
       Captures invoice-level details including invoice period, amounts, tax, 
