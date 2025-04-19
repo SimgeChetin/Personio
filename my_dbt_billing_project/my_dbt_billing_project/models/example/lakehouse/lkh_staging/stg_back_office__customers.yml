@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: stg_back_office__customer
+    description: >
+      Staged model for customer data sourced from the raw customer table.
+      Each record represents a customer customer and includes relevant information 
+      such as customer status, billing details, employee size, and churn tracking.
+    columns:
+      - name: customer_id
+        description: Unique identifier for the customer customer.
+        data_tests:
+          - dbt_constraints.primary_key
+      - name: subscription_id
+        description: Identifier linking the customer to a specific subscription.
+        data_tests:
+          - not_null
+      - name: card_number
+        description: Last digits or tokenized value of the card used for billing.
+      - name: customer_status
+        description: Status of the customer customer (e.g., active, churned, etc.).
+      - name: billing_address
+        description: Billing address associated with the customer.
+      - name: billing_email
+        description: Email address used for billing and invoice communication.
+      - name: employee_count
+        description: Number of employees at the customer's company.
+      - name: churn_date
+        description: Date when the customer churned, if applicable.

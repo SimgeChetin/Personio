@@ -1,0 +1,41 @@
+version: 2
+
+sources:
+  - name: staging_back_office
+    description: Data coming from back office. Contains data related to billing system of Personio.
+    database: raw_prod
+    freshness:
+      error_after:
+        period: hour
+        count: 24
+
+    tables:
+      - name: subscriptions
+        description: >
+          Contains information about customer subscriptions, including subscription plans,
+          billing frequency, start/end dates, amounts, and any discounts applied.
+
+      - name: customer
+        description: >
+          Represents each customer or business entity using Personio. This table includes
+          customer identifiers and is linked to subscriptions, billing informations.
+
+      - name: invoices
+        description: >
+          Contains invoice-level data for all charges issued to customers. Each invoice details
+          the products/services sold, associated amounts, discounts, adjustments, and taxes.
+
+      - name: products
+        description: >
+          Lists the catalog of available Personio products and services. Each record represents
+          a product that can be subscribed to by a customer.
+
+      - name: payments
+        description: >
+          Contains records of actual payments received from customers. Each payment is linked
+          to an invoice and a subscription, showing how much was paid and by which method.
+
+      - name: events
+        description: >
+          Captures all changes in the billing system, such as subscription creation, plan updates,
+          product additions/removals, and payment method changes. Useful for auditing and change tracking.
