@@ -47,9 +47,9 @@ models:
       - name: revenue_after_discounts
         description: Monthly invoice revenue after discounts.
       - name: starting_month_revenue
-        description: Revenue at the beginning of the month (before discount), used for churn/loss metrics.
+        description: Revenue at the beginning of the month, previous month, (before discount), used for churn/loss metrics.
       - name: starting_month_revenue_after_discounts
-        description: Revenue at the beginning of the month (after discount), used for churn/loss metrics.
+        description: Revenue at the beginning of the month, previous month, (after discount), used for churn/loss metrics.
       - name: churn_lost_revenue
         description: Revenue lost due to churn based on start-of-month values.
       - name: churn_lost_revenue_after_discounts
@@ -61,13 +61,50 @@ models:
       - name: churn_lost_revenue_cash
         description: Cash revenue lost due to churn.
       - name: new_revenue
-        description: First-time revenue for new customers in their acquisition month.
-      - name: is_new_customer
-        description: Boolean indicating if the customer is newly acquired in this billing month.
+        description: Revenue from newly acquired subscriptions for given billing period. (gross).
+      - name: new_revenue_after_discounts
+        description: Revenue from new subscriptions after discounts for given billing period.
+      - name: is_new_subscription
+        description: Flag indicating whether given billing period is the first month of the subscription.
+
       - name: gross_revenue
-        description: Gross MRR including starting month revenue after discounts, upgrade revenue and new revenue.
+        description: >
+          Gross Revenue is recognized on an invoiced basis. 
+          For new subscriptions (first month), gross_revenue is equal to the total invoice amount before discounts. 
+          For existing subscriptions, gross_revenue is computed as:
+          `starting_month_revenue` (last month's revenue before discount) 
+          plus any `upgrade_revenue` (e.g. expansion of the plan or added features).
+          Downgrades, churn, and discounts are not subtracted here to reflect the full revenue potential before loss or reduction.
+
       - name: net_revenue
-        description: Net MRR is calculated deducting churn lost revenue after discounts and downgrade revenue.
+        description: >
+          Net revenue is recognized on an invoiced basis and **adjusted** for discounts, churn, 
+          upgrades, and downgrades. For new subscriptions, it is calculated as:
+          `new_revenue_after_discounts` minus any `downgrade_revenue` in case customer switches to another subcription with less cost.
+          For ongoing subscriptions, it is:
+          `starting_month_revenue_after_discounts` + `upgrade_revenue` 
+          - `downgrade_revenue` - `churn_lost_revenue_after_discounts`. 
+          This gives a true picture of retained and recurring revenue for the month after all pricing dynamics.
+
+      - name: gross_revenue_retention
+        description: >
+          Gross Revenue Retention (GRR) measures the percentage of revenue retained from existing subscriptions,
+          excluding any upgrades or new subscriptions. It is calculated as:
+          
+          (starting_month_revenue_after_discounts - churn_lost_revenue_after_discounts - downgrade_revenue)
+          / starting_month_revenue_after_discounts.
+          
+          This metric excludes revenue from new subscriptions and upgrades, offering a pure view of
+          revenue sustainability from existing customers.
+
+      - name: net_revenue_retention
+        description: >
+          Net Revenue Retention (NRR) measures the percentage of recurring revenue retained from existing subscriptions,
+          accounting for the impact of upgrades and downgrades, but excluding new subscriptions.
+          It is calculated as:
+          
+          (starting_month_revenue_after_discounts + upgrade_revenue - churn_lost_revenue_after_discounts - downgrade_revenue)
+          / starting_month_revenue_after_discounts.          
       - name: is_customer_churned
         description: Boolean indicating if the customer churned for given billing period.
       - name: months_left_to_churn
