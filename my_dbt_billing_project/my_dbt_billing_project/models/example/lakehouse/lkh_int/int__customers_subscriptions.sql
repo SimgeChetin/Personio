@@ -14,6 +14,10 @@ select
     , subscriptions.subs_discount
     , subscriptions.subs_plan_name
     , subscriptions.subscription_status
+    , {{ dbt_utils.generate_surrogate_key([
+	    "customer_details.customer_id",
+	    "subscriptions.subscription_id"
+	    ]) }} as customer_subscription_pk
 from {{ ref('stg_back_office__customers') }} as customer_details
 inner join
 {{ ref('stg_back_office__subscriptions') }} as subscriptions

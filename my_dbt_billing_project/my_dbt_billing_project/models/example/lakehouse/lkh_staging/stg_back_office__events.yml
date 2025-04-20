@@ -20,7 +20,9 @@ models:
       - name: event_category
         description: High-level category of the event (e.g., subscription, application, payment, invoice, etc.).
       - name: event_type
-        description: Specific type of event that occurred (e.g., application-added, application-removed, subscription-created, subscription-stop etc.).
+        description: >
+          Specific type of event that occurred 
+          (e.g., application-added, application-removed, subscription-created, subscription-updated, subscription-stop etc.).
       - name: event_details
         description: >
           Semi-structured JSON field containing details about the event. 

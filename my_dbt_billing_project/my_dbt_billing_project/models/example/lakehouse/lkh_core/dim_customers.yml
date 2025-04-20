@@ -1,10 +1,10 @@
 version: 2
 
 models:
-  - name: stg_back_office__customer
+  - name: dim_customers
     description: >
-      Staged model for customer data sourced from the raw customer table.
-      Each record represents a customer customer and includes relevant information 
+      Dimensional model for customer data.
+      Each record represents a customer and includes relevant information 
       such as customer status, billing details, employee size, and churn tracking.
     columns:
       - name: customer_id

@@ -6,11 +6,22 @@ models:
       Intermediate model that joins customer details with subscription data
       to provide a consolidated view of each customer's subscription lifecycle,
       billing frequency, and current status.
+      The primary key of this table consists of `customer_id` and `subscription_id`,
+      as each customer can have multiple subscriptions over time.
     columns:
+      - name: customer_subscription_pk
+        description: Unique identifier for the customer and subscription.
+        data_tests:
+          - dbt_constraints.primary_key
       - name: customer_id
         description: Unique identifier for the customer.
-        tests:
+        data_tests:
           - not_null
+      - name: subscription_id
+        description: Unique identifier of the subscription.
+        data_tests:
+          - not_null
+          - unique
       - name: customer_status
         description: Current status of the customer (e.g., active, churned, etc.).
       - name: billing_address
@@ -21,16 +32,19 @@ models:
         description: Number of employees at the customer's company.
       - name: customer_churn_billing_year_month
         description: Month when the customer churned, if applicable (truncated to year-month).
-      - name: subscription_id
-        description: Unique identifier of the subscription.
-        tests:
-          - not_null
       - name: subs_start_billing_year_month
         description: Month when the subscription started (truncated to year-month).
       - name: subs_end_billing_year_month
         description: Month when the subscription ended or placeholder date if ongoing.
       - name: is_subscription_to_renew
-        description: Boolean indicating if the subscription is still active and due for renewal.
+        description: >
+          Boolean indicating if the subscription is still active and due for renewal.
+          If the subs_end_billing_year_month equal to future time place holder
+          it means the subscription is active and expected to be renewed.
+          Then it gets assigned value: 'True'
+          If the subs_end_billing_year_month is not equal to future time place holder
+          it means the subscription is deactivated and not expected to be renewed.
+          Then it gets assigned value: 'False'.
       - name: subs_billing_frequency
         description: Frequency of the subscription billing (e.g., monthly, yearly).
       - name: subs_amount
@@ -43,7 +57,10 @@ models:
         description: Current status of the subscription (e.g., active, deactivated, waiting etc.).
 
     data_tests:
-      - dbt_constraints.primary_key:
-          column_names:
-            - customer_id
-            - subscription_id
+      - dbt_utils.mutually_exclusive_ranges:
+          description: >
+            Ensures that each customer does not have overlapping active subscriptions
+            by checking non-overlapping start and end months per subscription.
+          lower_bound_column: subs_start_billing_year_month
+          upper_bound_column: subs_end_billing_year_month
+          partition_by: customer_id

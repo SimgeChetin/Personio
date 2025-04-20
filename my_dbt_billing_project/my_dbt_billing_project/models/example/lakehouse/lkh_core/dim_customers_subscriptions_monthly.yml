@@ -1,0 +1,73 @@
+version: 2
+
+models:
+  - name: dim_customers_subscriptions_monthly
+    description: >
+      Dimensional model that tracks the status of customer subscriptions for each billing month.
+      Enriches customer-subscription pairs with a generated monthly snapshot,
+      including billing status, customer activity, renewal indicators, and time-based metrics.
+
+    columns:
+      - name: customer_subscription_year_month_pk
+        description: >
+          Surrogate key uniquely identifying a customer-subscription for a given billing month.
+          Constructed from customer_id, subscription_id, and billing_year_month.
+        data_tests:
+          - dbt_constraints.primary_key
+      - name: customer_id
+        description: Unique identifier for the customer.
+        data_tests:
+          - not_null
+      - name: subscription_id
+        description: Unique identifier for the subscription.
+        data_tests:
+          - not_null
+      - name: billing_year_month
+        description: Billing period truncated to the month.
+      - name: billing_address
+        description: Customer's billing address.
+      - name: billing_email
+        description: Customer's billing email.
+      - name: employee_count
+        description: Number of employees at the customer's company.
+      - name: customer_churn_billing_year_month
+        description: Month when the customer churned, if applicable.
+      - name: subs_start_billing_year_month
+        description: Month when the subscription started.
+      - name: subs_end_billing_year_month
+        description: Month when the subscription ended (or far-future placeholder if still active).
+      - name: is_subscription_to_renew
+        description: >
+          Boolean indicating if the subscription is still active and due for renewal.
+          If the subs_end_billing_year_month equal to future time place holder
+          it means the subscription is active and expected to be renewed.
+          Then it gets assigned value: 'True'
+          If the subs_end_billing_year_month is not equal to future time place holder
+          it means the subscription is deactivated and not expected to be renewed.
+          Then it gets assigned value: 'False'.
+      - name: subs_billing_frequency
+        description: Frequency of billing (e.g., monthly, yearly).
+      - name: subs_amount
+        description: Total subscription amount before discounts.
+        data_tests:
+          - dbt_utils.expression_is_true:
+              expression: "subs_amount > 0"
+      - name: subs_discount
+        description: Discount applied to the subscription.
+        data_tests:
+          - dbt_utils.expression_is_true:
+              expression: "subs_discount > 0"
+      - name: subs_plan_name
+        description: Subscription plan name (e.g., Core, Core Pro).
+      - name: subscription_status
+        description: > 
+          Status of the subscription during the billing month. (e.g., active, waiting, deactivated, expired..).
+          If subscription is not yet ended for given billing period, the value remains 'active'.
+      - name: customer_status
+        description: >
+          Status of the customer during the billing month. (e.g., active, churned.).
+          If not yet churned for given billing period, the value remains 'active'.
+      - name: months_left_to_new_subscription
+        description: >
+          Indicates how many months are left until a new subscription starts.
+          Useful for forecasting future subscription activations.
