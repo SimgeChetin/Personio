@@ -4,11 +4,11 @@ models:
   - name: stg_back_office__invoice_items
     description: >
       Staged model for invoices, sourced from the raw invoices table. 
-      Captures invoice-level details including invoice period, amounts, tax, 
+      Captures invoice item level details including invoice period, amounts, tax, 
       and product charge information per customer.
     columns:
       - name: invoice_item_id
-        description: Identifier for the specific line item within the invoice. Each invoice item related to one specific feature(subscription, application, invoice).
+        description: Identifier for the specific line item within the invoice. Each invoice item related to one specific feature(subscription, application, discount).
         data_tests:
           - dbt_constraints.primary_key
       - name: invoice_id
