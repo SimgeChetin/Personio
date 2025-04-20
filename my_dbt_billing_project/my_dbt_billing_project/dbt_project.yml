@@ -30,7 +30,22 @@ clean-targets:         # directories to be removed by `dbt clean`
 # directory as views. These settings can be overridden in the individual model
 # files using the `{{ config(...) }}` macro.
 models:
-  my_dbt_billing_project:
-    # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
+    my_dbt_billing_project:
+      lakehouse:
+            exports:
+                schema: "exports"
+                materialized: table
+            lkh_staging:
+                schema: "lkh_staging"
+                materialized: view
+            lkh_core:
+                schema: "lkh_core"
+                materialized: table
+            lkh_int:
+                schema: "lkh_int"
+                materialized: table
+            lkh_mart:
+                schema: "lkh_mart"
+                materialized: table    
+vars:
+    in_long_time: "9999-12-31"
