@@ -1,0 +1,74 @@
+version: 2
+
+models:
+  - name: mart_customers_mrr
+    description: >
+      Monthly recurring revenue (MRR) mart table, combining customer subscription activity,
+      invoice based revenue, payment cash revenue, and churn insights.
+      Includes calculations for net/gross revenue, upgrades/downgrades,
+      and revenue loss due to churn.
+    columns:
+      - name: customer_id
+        description: Unique identifier for the customer.
+        data_tests:
+          - not_null
+          - dbt_constraints.foreign_key:
+              pk_table_name: ref('dim_customers')
+              pk_column_name: customer_id
+      - name: subscription_id
+        description: Unique identifier for the subscription.
+        data_tests:
+          - not_null
+          - dbt_constraints.foreign_key:
+              pk_table_name: ref('dim_customers_subscriptions_monthly')
+              pk_column_name: subscription_id
+      - name: billing_year_month
+        description: Month of billing (truncated to year and month).
+        data_tests:
+          - not_null
+      - name: customer_status
+        description: Status of the customer during the billing month (e.g. active, churned).
+      - name: customer_churn_billing_year_month
+        description: Billing month when the customer churned.
+      - name: subs_start_billing_year_month
+        description: Subscription start month.
+      - name: subs_end_billing_year_month
+        description: Subscription end month or placeholder if ongoing.
+      - name: is_subscription_to_renew
+        description: Boolean flag for subscriptions due for renewal.
+      - name: months_left_to_new_subscription
+        description: Number of months until subscription starts (if subscription starts in the future).
+      - name: upgrade_revenue
+        description: Monthly revenue due to product upgrades.
+      - name: downgrade_revenue
+        description: Monthly revenue lost due to downgrades.
+      - name: revenue
+        description: Monthly invoice revenue (before discounts).
+      - name: revenue_after_discounts
+        description: Monthly invoice revenue after discounts.
+      - name: starting_month_revenue
+        description: Revenue at the beginning of the month (before discount), used for churn/loss metrics.
+      - name: starting_month_revenue_after_discounts
+        description: Revenue at the beginning of the month (after discount), used for churn/loss metrics.
+      - name: churn_lost_revenue
+        description: Revenue lost due to churn based on start-of-month values.
+      - name: churn_lost_revenue_after_discounts
+        description: Discounted revenue lost due to churn.
+      - name: revenue_cash
+        description: Revenue actually received via payments (cash flow).
+      - name: starting_month_revenue_cash
+        description: Cash revenue at the start of the month.
+      - name: churn_lost_revenue_cash
+        description: Cash revenue lost due to churn.
+      - name: new_revenue
+        description: First-time revenue for new customers in their acquisition month.
+      - name: is_new_customer
+        description: Boolean indicating if the customer is newly acquired in this billing month.
+      - name: gross_revenue
+        description: Gross MRR including starting month revenue after discounts, upgrade revenue and new revenue.
+      - name: net_revenue
+        description: Net MRR is calculated deducting churn lost revenue after discounts and downgrade revenue.
+      - name: is_customer_churned
+        description: Boolean indicating if the customer churned for given billing period.
+      - name: months_left_to_churn
+        description: Number of months remaining before the customer is expected to churn for given billing period
