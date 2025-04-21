@@ -20,4 +20,5 @@ left join
 on cust.customer_id = invoiced_products.customer_id
 and invoiced_products.product_type = 'application'
 where cust.billing_year_month <= add_months(date_trunc('month', current_date()), 4)
+--- Take into consideration subscriptions that are flagged as to be renewed
 and is_subscription_to_renew

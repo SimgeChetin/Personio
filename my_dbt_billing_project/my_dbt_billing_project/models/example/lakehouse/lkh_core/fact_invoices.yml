@@ -37,10 +37,10 @@ models:
       - name: upgrade_invoice_amount
         description:  >
          Total amount charged for upgraded applications within the invoice period.
-         Related event type: 'application-added'
+         Example event type: 'application-added'
       - name: downgrade_invoice_amount
         description: > 
           Total amount removed due to application downgrades within the invoice period.
-          Related event type: 'application-removed'
+          Example event type: 'application-removed'
       - name: _dbt_insert_at
         description: Timestamp when the record was inserted or updated by the pipeline.
