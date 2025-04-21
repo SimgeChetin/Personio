@@ -23,7 +23,11 @@ models:
               pk_table_name: ref('dim_customers_subscriptions_monthly')
               pk_column_name: subscription_id
       - name: billing_year_month
-        description: Month of billing (truncated to year and month).
+        description: Month of billing (truncated to year and month). Sourced from dim_dates calendar table.
+        data_tests:
+          - not_null
+      - name: customer_billing_year_month
+        description: Month of billing for a given customer(truncated to year and month).
         data_tests:
           - not_null
       - name: customer_status
