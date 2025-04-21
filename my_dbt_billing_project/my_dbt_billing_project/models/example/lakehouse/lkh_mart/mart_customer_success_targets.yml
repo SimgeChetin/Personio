@@ -48,3 +48,9 @@ models:
         description: >
           Boolean flag indicating whether the customer is on a core plan and does not yet
           have the Recruiting add-on. Used to identify cross-sell opportunities.
+
+    data_tests:
+      - dbt_constraints.primary_key:
+          column_names:
+            - customer_id
+            - addon_name

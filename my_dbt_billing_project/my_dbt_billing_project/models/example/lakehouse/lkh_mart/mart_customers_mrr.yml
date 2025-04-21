@@ -109,3 +109,10 @@ models:
         description: Boolean indicating if the customer churned for given billing period.
       - name: months_left_to_churn
         description: Number of months remaining before the customer is expected to churn for given billing period
+
+    data_tests:
+      - dbt_constraints.primary_key:
+          column_names:
+            - customer_id
+            - subscription_id
+            - billing_year_month
