@@ -3,10 +3,10 @@ version: 2
 models:
   - name: mart_customers_mrr
     description: >
-      Monthly recurring revenue (MRR) mart table, combining customer subscription activity,
+      Monthly recurring revenue (MRR) mart table, gives monthly overview combining customer subscription activity,
       invoice based revenue, payment cash revenue, and churn insights.
-      Includes calculations for net/gross revenue, upgrades/downgrades,
-      and revenue loss due to churn.
+      Includes calculations for net/gross revenue, upgrades/downgrades and revenue loss due to churn.
+     
     columns:
       - name: customer_id
         description: Unique identifier for the customer.
