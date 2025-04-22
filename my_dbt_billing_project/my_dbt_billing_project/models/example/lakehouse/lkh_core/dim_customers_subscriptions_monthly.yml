@@ -18,6 +18,9 @@ models:
         description: Unique identifier for the customer.
         data_tests:
           - not_null
+          - dbt_constraints.foreign_key:
+              pk_table_name: ref('dim_customers')
+              pk_column_name: customer_id
       - name: subscription_id
         description: Unique identifier for the subscription.
         data_tests:
