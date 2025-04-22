@@ -18,7 +18,10 @@ models:
     columns:
       - name: customer_id
         description: "Unique identifier for the customer."
-
+        data_tests:
+          - dbt_constraints.foreign_key:
+              pk_table_name: ref('dim_customers')
+              pk_column_name: customer_id
       - name: subscription_plan_name
         description: "Name of the subscription plan the customer is currently on (core product)."
 
