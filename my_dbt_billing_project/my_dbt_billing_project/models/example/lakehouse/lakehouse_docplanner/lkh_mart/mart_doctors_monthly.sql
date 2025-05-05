@@ -41,17 +41,3 @@ select
     , nb_of_unique_patient_visits_first_engaged_month >=2 then has_at_least_2_patient_bookings_in_first_engaged_month
 from doctors_monthly_prep
 group by all
-
-
-Number of engaged doctors with at least 3 bookings from unique patients monthly, also as a share of all engaged doctors,
-Percent of new engaged doctors that get 1 new patients who book visits to them in the 1st month after becoming engaged,
-Number of new engaged doctors that get 2 patient bookings from new and unique patients in the 1st month after becoming engaged.
-
-
-
-select
-year_month
-, count(case when is_engaged_month then doctor_id end) as number_of_engaged_doctors
-, count(case when nb_of_unique_patient_visits_engaged_month then doctor_id end ) as
-number_of_engaged_doctors_w_at_least_3_patient_bookings
-, 
