@@ -32,17 +32,11 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
     my_dbt_billing_project:
       lakehouse:
-            exports:
-                schema: "exports"
-                materialized: table
             lkh_staging:
                 schema: "lkh_staging"
                 materialized: view
             lkh_core:
                 schema: "lkh_core"
-                materialized: table
-            lkh_int:
-                schema: "lkh_int"
                 materialized: table
             lkh_mart:
                 schema: "lkh_mart"
