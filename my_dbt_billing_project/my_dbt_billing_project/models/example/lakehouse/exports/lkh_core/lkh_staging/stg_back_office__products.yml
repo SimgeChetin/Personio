@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: stg_back_office__products
+    description: >
+      Staged model for products, sourced from the raw products table. 
+      Contains essential attributes for each product including pricing and classification details.
+    columns:
+      - name: product_id
+        description: Unique identifier for the product.
+        data_tests:
+          - dbt_constraints.primary_key
+      - name: product_name
+        description: Name of the product or service offered.
+        data_tests:
+          - not_null
+      - name: product_type
+        description: Type or category of the product (e.g., subsciption, application, discount).
+        data_tests:
+          - not_null
+      - name: price
+        description: >
+          Base price of the product. May be null if price is derived from `price_per_unit`.
+      - name: price_per_unit
+        description: >
+          Price per unit if the product is usage-based. Null for flat-fee products.

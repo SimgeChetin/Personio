@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: stg_back_office__payments
+    description: >
+      Staged model for payments, sourced from the raw payments table. 
+      Includes details about payment transactions such as amount, date, and method, 
+      and links to invoices and subscriptions.
+    columns:
+      - name: payment_id
+        description: Unique identifier of the payment transaction.
+        data_tests:
+          - dbt_constraints.primary_key
+      - name: invoice_id
+        description: Identifier of the invoice associated with the payment.
+        data_tests:
+          - not_null
+      - name: subscription_id
+        description: Identifier of the subscription associated with the payment.
+        data_tests:
+          - not_null
+      - name: payment_amount
+        description: Amount of money paid by the customer.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "payment_amount > 0"
+      - name: payment_date
+        description: Date when the payment was made.
+        data_tests:
+          - not_null
+      - name: payment_method
+        description: Payment method used by the customer (e.g., credit_card, bank_transfer, SEPA).
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['credit card', 'bank_transfer', 'SEPA']

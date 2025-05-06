@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: stg_back_office__subscriptions
+    description: >
+      Staged model for subscriptions, sourced from the raw subscriptions table.
+      Includes key attributes such as start/end dates, billing frequency, amount, discount,
+      and plan details. End dates are defaulted to a far-future date if not present.
+
+    columns:
+      - name: subscription_id
+        description: Unique identifier of the subscription. When the subscription is updated, a new subscription_id is generated.
+        data_tests:
+          - dbt_constraints.primary_key
+      - name: customer_id
+        description: Unique identifier for the customer customer associated with the subscription.
+        data_tests:
+          - not_null
+      - name: subs_start_date
+        description: The date when the subscription started.
+        data_tests:
+          - not_null      
+      - name: subs_end_date
+        description: >
+          The date when the subscription ended. If the subscription is still active,
+          it is set to a placeholder date defined by the variable `in_long_time`.
+        data_tests:
+          - not_null 
+      - name: subs_billing_frequency
+        description: Frequency of billing for the subscription (e.g., monthly, yearly).
+      - name: subs_amount
+        description: Original amount billed for the subscription before any discounts.
+        data_tests:
+          - dbt_utils.expression_is_true:
+              expression: "subs_amount > 0"
+      - name: subs_discount
+        description: Discount amount applied to the subscription.
+        data_tests:
+          - dbt_utils.expression_is_true:
+              expression: "subs_discount > 0"
+      - name: subs_plan_name
+        description: Name of the subscription plan selected by the customer. (Core Plan, Core Pro Plan)
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['Core', 'Core Pro']
+      - name: subscription_status
+        description: Current status of the subscription (e.g., active, waiting(for subscriptions starting in future or renewed ones), deactivated, expired).

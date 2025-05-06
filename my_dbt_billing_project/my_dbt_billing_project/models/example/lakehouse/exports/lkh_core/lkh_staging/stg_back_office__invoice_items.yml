@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: stg_back_office__invoice_items
+    description: >
+      Staged model for invoices, sourced from the raw invoices table. 
+      Captures invoice item level details including invoice period, amounts, tax, 
+      and product charge information per customer.
+    columns:
+      - name: invoice_item_id
+        description: Identifier for the specific line item within the invoice. Each invoice item related to one specific feature(subscription, application, discount).
+        data_tests:
+          - dbt_constraints.primary_key
+      - name: invoice_id
+        description: Unique identifier of the invoice. This field represents one single invoice to be paid for the billing month.
+        data_tests:
+          - not_null
+      - name: customer_id
+        description: Identifier of the customer customer linked to the invoice.
+        data_tests:
+          - not_null
+      - name: invoice_created_month
+        description: The month when the invoice was created.
+        data_tests:
+          - not_null
+      - name: charge_product_id
+        description: Identifier of the product being charged in the invoice.
+        data_tests:
+          - not_null
+      - name: invoice_amount
+        description: Total charge amount in the invoice for the product, excluding tax.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "invoice_amount >= 0"
+      - name: invoice_period_start_month
+        description: Start date of the billing period covered by the invoice.
+        data_tests:
+          - not_null
+      - name: invoice_period_end_month
+        description: End date of the billing period covered by the invoice.
+        data_tests:
+          - not_null
+      - name: tax_amount
+        description: Tax amount applied to the invoice. Defaults to 0 if not available.
+        data_tests:
+          - dbt_utils.expression_is_true:
+              expression: "tax_amount >= 0"

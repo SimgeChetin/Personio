@@ -1,0 +1,122 @@
+version: 2
+
+models:
+  - name: mart_customers_mrr
+    description: >
+      Monthly recurring revenue (MRR) mart table, gives monthly overview combining customer subscription activity,
+      invoice based revenue, payment cash revenue, and churn insights.
+      Includes calculations for net/gross revenue, upgrades/downgrades and revenue loss due to churn.
+     
+    columns:
+      - name: customer_id
+        description: Unique identifier for the customer.
+        data_tests:
+          - not_null
+          - dbt_constraints.foreign_key:
+              pk_table_name: ref('dim_customers')
+              pk_column_name: customer_id
+      - name: subscription_id
+        description: Unique identifier for the subscription.
+        data_tests:
+          - not_null
+          - dbt_constraints.foreign_key:
+              pk_table_name: ref('dim_customers_subscriptions_monthly')
+              pk_column_name: subscription_id
+      - name: billing_year_month
+        description: Month of billing (truncated to year and month). Sourced from dim_dates calendar table.
+        data_tests:
+          - not_null
+      - name: customer_billing_year_month
+        description: Month of billing for a given customer(truncated to year and month).
+        data_tests:
+          - not_null
+      - name: customer_status
+        description: Status of the customer during the billing month (e.g. active, churned).
+      - name: customer_churn_billing_year_month
+        description: Billing month when the customer churned.
+      - name: subs_start_billing_year_month
+        description: Subscription start month.
+      - name: subs_end_billing_year_month
+        description: Subscription end month or placeholder if ongoing.
+      - name: is_subscription_to_renew
+        description: Boolean flag for subscriptions due for renewal.
+      - name: months_left_to_new_subscription
+        description: Number of months until subscription starts (if subscription starts in the future).
+      - name: upgrade_revenue
+        description: Monthly revenue due to product upgrades.
+      - name: downgrade_revenue
+        description: Monthly revenue lost due to downgrades.
+      - name: revenue
+        description: Monthly invoice revenue (before discounts).
+      - name: revenue_after_discounts
+        description: Monthly invoice revenue after discounts.
+      - name: starting_month_revenue
+        description: Revenue at the beginning of the month, previous month, (before discount), used for churn/loss metrics.
+      - name: starting_month_revenue_after_discounts
+        description: Revenue at the beginning of the month, previous month, (after discount), used for churn/loss metrics.
+      - name: churn_lost_revenue
+        description: Revenue lost due to churn based on start-of-month values.
+      - name: churn_lost_revenue_after_discounts
+        description: Discounted revenue lost due to churn.
+      - name: revenue_cash
+        description: Revenue actually received via payments (cash flow).
+      - name: starting_month_revenue_cash
+        description: Cash revenue at the start of the month.
+      - name: churn_lost_revenue_cash
+        description: Cash revenue lost due to churn.
+      - name: new_revenue
+        description: Revenue from newly acquired subscriptions for given billing period. (gross).
+      - name: new_revenue_after_discounts
+        description: Revenue from new subscriptions after discounts for given billing period.
+      - name: is_new_subscription
+        description: Flag indicating whether given billing period is the first month of the subscription.
+
+      - name: gross_revenue
+        description: >
+          Gross Revenue is recognized on an invoiced basis. 
+          For new subscriptions (first month), gross_revenue is equal to the total invoice amount before discounts. 
+          For existing subscriptions, gross_revenue is computed as:
+          `starting_month_revenue` (last month's revenue before discount) 
+          plus any `upgrade_revenue` (e.g. expansion of the plan or added features).
+          Downgrades, churn, and discounts are not subtracted here to reflect the full revenue potential before loss or reduction.
+
+      - name: net_revenue
+        description: >
+          Net revenue is recognized on an invoiced basis and **adjusted** for discounts, churn, 
+          upgrades, and downgrades. For new subscriptions, it is calculated as:
+          `new_revenue_after_discounts` minus any `downgrade_revenue` in case customer switches to another subcription with less cost.
+          For ongoing subscriptions, it is:
+          `starting_month_revenue_after_discounts` + `upgrade_revenue` 
+          - `downgrade_revenue` - `churn_lost_revenue_after_discounts`. 
+          This gives a true picture of retained and recurring revenue for the month after all pricing dynamics.
+
+      - name: gross_revenue_retention
+        description: >
+          Gross Revenue Retention (GRR) measures the percentage of revenue retained from existing subscriptions,
+          excluding any upgrades or new subscriptions. It is calculated as:
+          
+          (starting_month_revenue_after_discounts - churn_lost_revenue_after_discounts - downgrade_revenue)
+          / starting_month_revenue_after_discounts.
+          
+          This metric excludes revenue from new subscriptions and upgrades, offering a pure view of
+          revenue sustainability from existing customers.
+
+      - name: net_revenue_retention
+        description: >
+          Net Revenue Retention (NRR) measures the percentage of recurring revenue retained from existing subscriptions,
+          accounting for the impact of upgrades and downgrades, but excluding new subscriptions.
+          It is calculated as:
+          
+          (starting_month_revenue_after_discounts + upgrade_revenue - churn_lost_revenue_after_discounts - downgrade_revenue)
+          / starting_month_revenue_after_discounts.          
+      - name: is_customer_churned
+        description: Boolean indicating if the customer churned for given billing period.
+      - name: months_left_to_churn
+        description: Number of months remaining before the customer is expected to churn for given billing period
+
+    data_tests:
+      - dbt_constraints.primary_key:
+          column_names:
+            - customer_id
+            - subscription_id
+            - billing_year_month

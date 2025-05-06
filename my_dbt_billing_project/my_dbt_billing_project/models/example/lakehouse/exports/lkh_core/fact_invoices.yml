@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: fact_invoices
+    description: >
+      Fact table containing aggregated invoice information per invoice_id.
+      It includes base charge amounts, discounts, and changes due to product upgrade/downgrade events.
+      Incrementally updated based on latest _dbt_insert_at timestamp to capture late-arriving events.
+    columns:
+      - name: invoice_id
+        description: Unique identifier of the invoice.
+        data_tests:
+          - dbt_constraints.primary_key
+      - name: customer_id
+        description: Unique identifier for the customer associated with the invoice.
+        data_tests:
+          - not_null
+          - dbt_constraints.foreign_key:
+              pk_table_name: ref('dim_customers')
+              pk_column_name: customer_id
+      - name: invoice_created_month
+        description: Month when the invoice was created (truncated to month).
+        data_tests:
+          - not_null
+      - name: total_invoice_charge_amount
+        description: Total amount invoiced for products (excluding discounts).
+        data_tests:
+          - dbt_utils.expression_is_true:
+              expression: "total_invoice_charge_amount > 0"
+      - name: total_discount_amount
+        description: Total discount applied to the invoice.
+      - name: total_invoice_charge_amount_with_discount
+        description: Net invoice charge after discount (total charge - discount).
+        data_tests:
+          - dbt_utils.expression_is_true:
+              expression: "total_invoice_charge_amount_with_discount > 0"
+      - name: upgrade_invoice_amount
+        description:  >
+         Total amount charged for upgraded applications within the invoice period.
+         Example event type: 'application-added'
+      - name: downgrade_invoice_amount
+        description: > 
+          Total amount removed due to application downgrades within the invoice period.
+          Example event type: 'application-removed'
+      - name: _dbt_insert_at
+        description: Timestamp when the record was inserted or updated by the pipeline.
